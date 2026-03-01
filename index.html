@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spanish Quiz</title>
+  <style>
+    :root {
+      --bg: #fff8e7;
+      --card: #ffffff;
+      --text: #1c1a15;
+      --muted: #695d42;
+      --ok: #14532d;
+      --ok-bg: #dcfce7;
+      --bad: #9f1239;
+      --bad-bg: #ffe4e6;
+      --accent: #c11a2f;
+      --accent-dark: #9f1325;
+      --border: #e6d9b8;
+      --spain-red: #c3142d;
+      --spain-gold: #f1c62d;
+      --spain-navy: #1f2f5b;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Barlow Condensed", "Trebuchet MS", "Franklin Gothic Medium", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 8% 10%, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 35%),
+        repeating-linear-gradient(
+          125deg,
+          rgba(195, 20, 45, 0.08) 0px,
+          rgba(195, 20, 45, 0.08) 22px,
+          rgba(241, 198, 45, 0.13) 22px,
+          rgba(241, 198, 45, 0.13) 44px
+        ),
+        linear-gradient(180deg, #fff5db 0%, #ffe9bf 100%);
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .app {
+      width: min(720px, 100%);
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 16px 40px rgba(93, 33, 13, 0.18);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .app::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 5px;
+      background: linear-gradient(
+        90deg,
+        var(--spain-red) 0%,
+        var(--spain-red) 25%,
+        var(--spain-gold) 25%,
+        var(--spain-gold) 75%,
+        var(--spain-red) 75%,
+        var(--spain-red) 100%
+      );
+    }
+
+    .app::after {
+      content: "";
+      position: absolute;
+      right: -70px;
+      top: -70px;
+      width: 220px;
+      height: 220px;
+      background: linear-gradient(
+        135deg,
+        rgba(31, 47, 91, 0.08) 0%,
+        rgba(31, 47, 91, 0.08) 34%,
+        rgba(195, 20, 45, 0.08) 34%,
+        rgba(195, 20, 45, 0.08) 67%,
+        rgba(241, 198, 45, 0.12) 67%,
+        rgba(241, 198, 45, 0.12) 100%
+      );
+      transform: rotate(16deg);
+      pointer-events: none;
+    }
+
+    h1 {
+      margin: 6px 0 16px;
+      font-size: 2rem;
+      letter-spacing: 0.8px;
+      font-weight: 800;
+      color: var(--spain-navy);
+      text-transform: uppercase;
+    }
+
+    .setup, .quiz, .result {
+      display: none;
+      gap: 12px;
+    }
+    .setup.active, .quiz.active, .result.active { display: grid; }
+
+    label {
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
+
+    input[type="url"], input[type="text"] {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 1rem;
+      background: #fffef9;
+      color: var(--text);
+    }
+
+    button {
+      border: 0;
+      border-radius: 10px;
+      background: var(--accent);
+      color: white;
+      font-weight: 600;
+      padding: 11px 14px;
+      cursor: pointer;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+    }
+    button:hover { background: var(--accent-dark); }
+    button.secondary {
+      background: #f9edc8;
+      color: #473911;
+    }
+    button.secondary:hover { background: #f2dfaa; }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .row > * { flex: 1 1 180px; }
+
+    .info {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .word-card {
+      border: 1px solid #ecd79b;
+      border-radius: 14px;
+      padding: 14px;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(255, 248, 225, 1) 100%);
+    }
+    .word-label {
+      color: var(--muted);
+      margin-bottom: 6px;
+      font-size: 0.9rem;
+    }
+    .word {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--spain-navy);
+    }
+
+    .feedback {
+      padding: 10px 12px;
+      border-radius: 10px;
+      display: none;
+      font-weight: 600;
+    }
+    .feedback.ok {
+      display: block;
+      background: var(--ok-bg);
+      color: var(--ok);
+    }
+    .feedback.bad {
+      display: block;
+      background: var(--bad-bg);
+      color: var(--bad);
+    }
+
+    @media (max-width: 640px) {
+      body { padding: 12px; }
+      .app { padding: 16px; }
+      h1 { font-size: 1.6rem; }
+      .word { font-size: 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <h1>Spanish Quiz</h1>
+
+    <section id="setup" class="setup active">
+      <div class="row">
+        <button id="startBtn">Start Quiz</button>
+      </div>
+      <div id="setupMsg" class="feedback"></div>
+    </section>
+
+    <section id="quiz" class="quiz">
+      <div class="info" id="progress"></div>
+      <div class="info" id="liveScore"></div>
+      <div class="word-card">
+        <div class="word-label">Hungarian</div>
+        <div id="hungarianWord" class="word"></div>
+      </div>
+      <div class="row">
+        <input
+          id="answerInput"
+          type="text"
+          name="quiz-answer"
+          placeholder="Type Spanish translation"
+          autocomplete="off"
+          autocapitalize="off"
+          autocorrect="off"
+          spellcheck="false"
+        >
+      </div>
+      <div class="row">
+        <button id="checkBtn">Check</button>
+        <button id="pronounceBtn" class="secondary" type="button">Pronounce (es-ES)</button>
+      </div>
+      <div id="quizFeedback" class="feedback"></div>
+    </section>
+
+    <section id="result" class="result">
+      <h2>Quiz Finished</h2>
+      <div id="scoreLine" class="word"></div>
+      <div id="resultMessage" class="info"></div>
+      <div class="row">
+        <button id="restartBtn">Play Again</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const setupSection = document.getElementById("setup");
+    const quizSection = document.getElementById("quiz");
+    const resultSection = document.getElementById("result");
+    const setupMsg = document.getElementById("setupMsg");
+
+    const progressEl = document.getElementById("progress");
+    const liveScoreEl = document.getElementById("liveScore");
+    const hungarianWordEl = document.getElementById("hungarianWord");
+    const answerInput = document.getElementById("answerInput");
+    const quizFeedback = document.getElementById("quizFeedback");
+
+    const startBtn = document.getElementById("startBtn");
+    const checkBtn = document.getElementById("checkBtn");
+    const pronounceBtn = document.getElementById("pronounceBtn");
+    const restartBtn = document.getElementById("restartBtn");
+    const scoreLine = document.getElementById("scoreLine");
+    const resultMessageEl = document.getElementById("resultMessage");
+
+    const QUIZ_SIZE = 10;
+    let quizWords = [];
+    let quizDirections = [];
+    let currentIndex = 0;
+    let score = 0;
+    let checkedCurrent = false;
+    let spanishVoice = null;
+
+    function setVisible(section) {
+      setupSection.classList.remove("active");
+      quizSection.classList.remove("active");
+      resultSection.classList.remove("active");
+      section.classList.add("active");
+    }
+
+    function updateLiveScore() {
+      liveScoreEl.textContent = `Score so far: ${score}`;
+    }
+
+    function getResultMessage(finalScore) {
+      if (finalScore === QUIZ_SIZE) return "Perfecto total!";
+      if (finalScore >= 8) return "Muy bien, casi perfecto!";
+      if (finalScore >= 5) return "Buen progreso, sigue!";
+      return "Un poco mas de practica!";
+    }
+
+    function normalize(value) {
+      return value.trim().toLocaleLowerCase("es-ES");
+    }
+
+    function selectSpanishVoice() {
+      const voices = window.speechSynthesis.getVoices();
+      if (!voices || voices.length === 0) return;
+
+      spanishVoice =
+        voices.find((v) => v.lang === "es-ES") ||
+        voices.find((v) => v.lang && v.lang.toLowerCase().startsWith("es")) ||
+        null;
+    }
+
+    function parseCsv(text) {
+      const rows = text
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter(Boolean)
+        .map((line) => line.split(","))
+        .filter((cols) => cols.length >= 2)
+        .map((cols) => ({
+          magyar: cols[0].trim(),
+          spanyol: cols.slice(1).join(",").trim()
+        }))
+        .filter((item) => item.magyar && item.spanyol);
+
+      // Skip optional CSV header: magyar,spanyol
+      if (
+        rows.length > 0 &&
+        normalize(rows[0].magyar) === "magyar" &&
+        (normalize(rows[0].spanyol) === "spanyol" || normalize(rows[0].spanyol) === "spanish")
+      ) {
+        return rows.slice(1);
+      }
+
+      return rows;
+    }
+
+    function shuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function showSetupError(msg) {
+      setupMsg.className = "feedback bad";
+      setupMsg.textContent = msg;
+    }
+
+    function clearSetupError() {
+      setupMsg.className = "feedback";
+      setupMsg.textContent = "";
+    }
+
+    function buildQuizDirections(size) {
+      const directions = [];
+      const half = Math.floor(size / 2);
+
+      for (let i = 0; i < half; i++) directions.push("HU_TO_ES");
+      for (let i = half; i < size; i++) directions.push("ES_TO_HU");
+
+      if (size % 2 === 1 && Math.random() < 0.5) {
+        directions[directions.length - 1] = "HU_TO_ES";
+      }
+
+      return shuffle(directions);
+    }
+
+    async function loadCsvText() {
+      const candidates = [
+        "words.csv",
+        "./words.csv",
+        new URL("words.csv", window.location.href).toString()
+      ];
+
+      for (const path of candidates) {
+        try {
+          const response = await fetch(path, { cache: "no-store" });
+          if (response.ok) return await response.text();
+        } catch (_) {
+          // Try next candidate.
+        }
+      }
+
+      if (window.location.protocol === "file:") {
+        throw new Error("LOCAL_FILE_BLOCKED");
+      }
+      throw new Error("CSV_NOT_FOUND");
+    }
+
+    async function startQuiz() {
+      clearSetupError();
+      let text;
+      try {
+        text = await loadCsvText();
+      } catch (err) {
+        if (err && err.message === "LOCAL_FILE_BLOCKED") {
+          showSetupError("Browser blocked file access. Run from GitHub Pages or local server (not file://).");
+        } else {
+          showSetupError("Could not load words.csv. Make sure it is next to index.html on the server.");
+        }
+        return;
+      }
+
+      const allWords = parseCsv(text);
+      if (allWords.length < QUIZ_SIZE) {
+        showSetupError(`Need at least ${QUIZ_SIZE} valid lines in CSV.`);
+        return;
+      }
+
+      quizWords = shuffle(allWords).slice(0, QUIZ_SIZE);
+      quizDirections = buildQuizDirections(QUIZ_SIZE);
+      currentIndex = 0;
+      score = 0;
+      checkedCurrent = false;
+      renderQuestion();
+      setVisible(quizSection);
+    }
+
+    function renderQuestion() {
+      const item = quizWords[currentIndex];
+      const direction = quizDirections[currentIndex];
+      const isHuToEs = direction === "HU_TO_ES";
+      progressEl.textContent = `Question ${currentIndex + 1} / ${QUIZ_SIZE}`;
+      updateLiveScore();
+      document.querySelector(".word-label").textContent = isHuToEs ? "Hungarian" : "Spanish";
+      hungarianWordEl.textContent = isHuToEs ? item.magyar : item.spanyol;
+      answerInput.placeholder = isHuToEs ? "Type Spanish translation" : "Type Hungarian translation";
+      answerInput.value = "";
+      answerInput.disabled = false;
+      answerInput.focus();
+      checkedCurrent = false;
+      quizFeedback.className = "feedback";
+      quizFeedback.textContent = "";
+      checkBtn.textContent = "Check";
+    }
+
+    function checkAnswer() {
+      if (checkedCurrent) return;
+      const item = quizWords[currentIndex];
+      const direction = quizDirections[currentIndex];
+      const expected = direction === "HU_TO_ES" ? item.spanyol : item.magyar;
+      const user = normalize(answerInput.value);
+      const correct = normalize(expected);
+
+      if (user && user === correct) {
+        score++;
+        quizFeedback.className = "feedback ok";
+        quizFeedback.textContent = "Correct!";
+      } else {
+        quizFeedback.className = "feedback bad";
+        quizFeedback.textContent = `Wrong. Correct answer: ${expected}`;
+      }
+
+      checkedCurrent = true;
+      answerInput.disabled = true;
+      checkBtn.textContent = "Next";
+      updateLiveScore();
+      // Delay focus so the same Enter key press cannot instantly trigger Next.
+      window.setTimeout(() => checkBtn.focus(), 0);
+    }
+
+    function nextQuestion() {
+      if (!checkedCurrent) return;
+      currentIndex++;
+      if (currentIndex >= QUIZ_SIZE) {
+        scoreLine.textContent = `Your score: ${score} / ${QUIZ_SIZE}`;
+        resultMessageEl.textContent = getResultMessage(score);
+        setVisible(resultSection);
+        return;
+      }
+      renderQuestion();
+    }
+
+    function pronounceCurrent() {
+      const item = quizWords[currentIndex];
+      if (!item) return;
+      const utter = new SpeechSynthesisUtterance(item.spanyol);
+      utter.lang = "es-ES";
+      if (spanishVoice) utter.voice = spanishVoice;
+      utter.rate = 0.95;
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utter);
+    }
+
+    selectSpanishVoice();
+    if ("onvoiceschanged" in window.speechSynthesis) {
+      window.speechSynthesis.onvoiceschanged = selectSpanishVoice;
+    }
+
+    startBtn.addEventListener("click", startQuiz);
+    checkBtn.addEventListener("click", () => {
+      if (!checkedCurrent) checkAnswer();
+      else nextQuestion();
+    });
+    pronounceBtn.addEventListener("click", pronounceCurrent);
+    restartBtn.addEventListener("click", () => setVisible(setupSection));
+    answerInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        if (!checkedCurrent) checkAnswer();
+        else nextQuestion();
+      }
+    });
+  </script>
+</body>
+</html>
