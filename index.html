@@ -45,7 +45,15 @@
 
     .app {
       width: min(720px, 100%);
-      background: var(--card);
+      background:
+        repeating-linear-gradient(
+          90deg,
+          rgba(195, 20, 45, 0.04) 0px,
+          rgba(195, 20, 45, 0.04) 72px,
+          rgba(241, 198, 45, 0.06) 72px,
+          rgba(241, 198, 45, 0.06) 144px
+        ),
+        var(--card);
       border: 1px solid var(--border);
       border-radius: 20px;
       padding: 20px;
@@ -73,19 +81,7 @@
     }
 
     .app::after {
-      content: "";
-      position: absolute;
-      right: -70px;
-      top: -70px;
-      width: 220px;
-      height: 220px;
-      border-radius: 50%;
-      background:
-        radial-gradient(circle at 58% 42%, rgba(241, 198, 45, 0.32) 0%, rgba(241, 198, 45, 0.32) 24%, rgba(241, 198, 45, 0) 25%),
-        radial-gradient(circle at 46% 58%, rgba(195, 20, 45, 0.24) 0%, rgba(195, 20, 45, 0.24) 38%, rgba(195, 20, 45, 0) 39%),
-        linear-gradient(145deg, rgba(241, 198, 45, 0.1) 0%, rgba(195, 20, 45, 0.12) 100%);
-      transform: rotate(16deg);
-      pointer-events: none;
+      content: none;
     }
 
     h1 {
