@@ -92,12 +92,12 @@ mi,nosotros
 ti,vosotros
 ők,ellos
 
-mi,qué
-ki,quién
-hol,dónde
-mikor,cuándo
-miért,por qué
-hogyan,cómo
+mi?,qué
+ki?,quién
+hol?,dónde
+mikor?,cuándo
+miért?,por qué
+hogyan?,cómo
 
 és,y
 vagy,o
