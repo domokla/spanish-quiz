@@ -253,7 +253,7 @@
     const scoreLine = document.getElementById("scoreLine");
     const resultMessageEl = document.getElementById("resultMessage");
 
-    const QUIZ_SIZE = 10;
+    const QUIZ_SIZE = 20;
     let quizWords = [];
     let quizDirections = [];
     let currentIndex = 0;
@@ -274,8 +274,8 @@
 
     function getResultMessage(finalScore) {
       if (finalScore === QUIZ_SIZE) return "Perfecto total!";
-      if (finalScore >= 8) return "Muy bien, casi perfecto!";
-      if (finalScore >= 5) return "Buen progreso, sigue!";
+      if (finalScore >= 16) return "Muy bien, casi perfecto!";
+      if (finalScore >= 10) return "Buen progreso, sigue!";
       return "Un poco mas de practica!";
     }
 

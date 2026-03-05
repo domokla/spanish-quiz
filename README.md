@@ -4,7 +4,7 @@ A simple private web app to practice Spanish vocabulary.
 Uses a curated CSV file (Hungarian → Spanish) for family and school learning.
 
 ## Features
-- 10 random words per quiz session
+- 20 random words per quiz session
 - Instant feedback on answers
 - Pronounce Spanish words (es-ES)
 - Simple static HTML app
