@@ -339,14 +339,11 @@
 
     function buildQuizDirections(size) {
       const directions = [];
-      const half = Math.floor(size / 2);
+      const huToEsCount = Math.round(size * 0.7);
+      const esToHuCount = size - huToEsCount;
 
-      for (let i = 0; i < half; i++) directions.push("HU_TO_ES");
-      for (let i = half; i < size; i++) directions.push("ES_TO_HU");
-
-      if (size % 2 === 1 && Math.random() < 0.5) {
-        directions[directions.length - 1] = "HU_TO_ES";
-      }
+      for (let i = 0; i < huToEsCount; i++) directions.push("HU_TO_ES");
+      for (let i = 0; i < esToHuCount; i++) directions.push("ES_TO_HU");
 
       return shuffle(directions);
     }
